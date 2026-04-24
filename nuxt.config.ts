@@ -20,6 +20,11 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'], // 全局 CSS
   content: {
     // 高亮配置现在在这里
+    database: {
+      type: 'sqlite',
+      // 💡 只有在生产环境（Cloudflare）才用内存模式避坑
+      filename: process.env.NODE_ENV === 'production' ? ':memory:' : './content.sqlite'
+    },
     build: {
       markdown: {
         highlight: {
