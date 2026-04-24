@@ -22,8 +22,12 @@ export default defineNuxtConfig({
     // 高亮配置现在在这里
     database: {
       type: 'sqlite',
-      // 💡 只有在生产环境（Cloudflare）才用内存模式避坑
-      filename: process.env.NODE_ENV === 'production' ? ':memory:' : './content.sqlite'
+      // 💡 Nuxt 4 下的正确姿势：
+      // 生产环境（Cloudflare）使用内存数据库，绕过文件系统写入和 C++ 编译权限
+      // 本地环境则在项目根目录生成一个持久化的 sqlite 文件
+      filename: process.env.NODE_ENV === 'production'
+        ? ':memory:'
+        : './.nuxt/content.cache.sqlite'
     },
     build: {
       markdown: {
