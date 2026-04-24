@@ -1,0 +1,29 @@
+{
+    "title": "AI 辅助 / AI Co-Pilot",
+    "desc": "利用人工智能增强编程与生产力",
+    "order": 5,
+    "items": [
+        {
+            "title": "Claude",
+            "desc": "极强的代码理解与长文本处理能力，全栈开发的得力助手。",
+            "url": "https://claude.ai",
+            "icon": "simple-icons:anthropic",
+            "tags": [
+                "LLM",
+                "Coding"
+            ],
+            "status": "Active"
+        },
+        {
+            "title": "DeepSeek",
+            "desc": "国产之光，在代码生成与逻辑推理上表现优异。",
+            "url": "https://chat.deepseek.com/",
+            "icon": "lucide:brain-circuit",
+            "tags": [
+                "AI",
+                "Coding"
+            ],
+            "status": "Active"
+        }
+    ]
+}

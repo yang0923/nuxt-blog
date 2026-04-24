@@ -1,0 +1,45 @@
+{
+	"json.schemas": [
+		{
+			"fileMatch": ["content/links/*.json"],
+			"schema": {
+				"type": "object", // 修正：如果一个文件对应一个分组，这里应该是 object
+				"required": ["title", "desc", "items"],
+				"properties": {
+					"title": { "type": "string", "description": "分组标题" },
+					"desc": { "type": "string", "description": "分组描述" },
+					"order": { "type": "number", "default": 0, "description": "显示排序权重，越小越靠前" },
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["title", "desc", "url", "tags", "status"],
+							"properties": {
+								"title": { "type": "string" },
+								"desc": { "type": "string" },
+								"url": { "type": "string", "format": "uri" },
+								"icon": { "type": "string", "description": "Lucide 或 MDI 图标名" },
+								"avatar": { "type": "string", "description": "头像图片链接" },
+								"status": {
+									"type": "string",
+									"enum": ["Active", "Offline", "Archived", "Pending", "Blocked"],
+									"markdownEnumDescriptions": [
+										"**Active (激活)**: 链路正常，双向通信稳定，内容同步活跃。",
+										"**Offline (离线)**: 链路中断，服务器宕机或链接已失效。",
+										"**Archived (归档)**: 节点长期未更新或已转为静态存档，不再高频监测。",
+										"**Pending (待定)**: 节点审核中或正在进行首次链路握手。",
+										"**Blocked (屏蔽)**: 该节点违反安全协议或存在恶意内容，已被系统强制拦截。"
+									]
+								},
+								"tags": {
+									"type": "array",
+									"items": { "type": "string" }
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	]
+}

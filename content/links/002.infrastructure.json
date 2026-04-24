@@ -1,0 +1,52 @@
+{
+    "title": "基础设施 / Infrastructure",
+    "desc": "支撑网络加速、自动化部署与容器化基建",
+    "order": 2,
+    "items": [
+        {
+            "title": "Cloudflare",
+            "desc": "全球加速与安全防护，极客必备的域名解析与 Workers 部署平台。",
+            "url": "https://www.cloudflare.com",
+            "icon": "vscode-icons:file-type-cloudflare",
+            "tags": [
+                "CDN",
+                "DNS",
+                "WAF"
+            ],
+            "status": "Active"
+        },
+        {
+            "title": "Vercel",
+            "desc": "前端部署最佳选择，完美支持 Nuxt 3 与 Serverless 函数。",
+            "url": "https://vercel.com",
+            "icon": "vscode-icons:file-type-vercel",
+            "tags": [
+                "Deploy",
+                "Serverless"
+            ],
+            "status": "Active"
+        },
+        {
+            "title": "Docker Hub",
+            "desc": "容器化镜像仓库，LiveCMS 自动化部署的核心支撑。",
+            "url": "https://hub.docker.com",
+            "icon": "vscode-icons:file-type-docker2",
+            "tags": [
+                "DevOps",
+                "Images"
+            ],
+            "status": "Active"
+        },
+        {
+            "title": "GitHub",
+            "desc": "全球最大的开源代码托管平台，版本控制的核心枢纽。",
+            "url": "https://github.com",
+            "icon": "simple-icons:github",
+            "tags": [
+                "Git",
+                "OpenSource"
+            ],
+            "status": "Active"
+        }
+    ]
+}

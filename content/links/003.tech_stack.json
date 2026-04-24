@@ -1,0 +1,63 @@
+{
+    "title": "全栈技术栈 / Tech Stack",
+    "desc": "核心逻辑构建的基础语言、框架与高性能运行时",
+    "order": 3,
+    "items": [
+        {
+            "title": "Python",
+            "desc": "后端逻辑与爬虫抓取的基石，简单优雅且功能强大。",
+            "url": "https://www.python.org",
+            "icon": "vscode-icons:file-type-python",
+            "tags": [
+                "Backend",
+                "Scrapy"
+            ],
+            "status": "Active"
+        },
+        {
+            "title": "FastAPI",
+            "desc": "基于 Python 的高性能 Web 框架，自动生成 OpenAPI 交互文档。",
+            "url": "https://fastapi.tiangolo.com",
+            "icon": "vscode-icons:file-type-fastapi",
+            "avatar": "https://fastapi.tiangolo.com/img/icon-white.svg",
+            "tags": [
+                "API",
+                "Backend"
+            ],
+            "status": "Active"
+        },
+        {
+            "title": "Rust",
+            "desc": "系统级编程语言，为 Tauri 与核心服务提供内存安全与极致性能。",
+            "url": "https://www.rust-lang.org",
+            "icon": "vscode-icons:file-type-rust",
+            "tags": [
+                "System",
+                "Performance"
+            ],
+            "status": "Active"
+        },
+        {
+            "title": "Nuxt 4",
+            "desc": "直观且强大的 Vue 框架，本项目及多个 CMS 的底层架构。",
+            "url": "https://nuxt.com",
+            "icon": "vscode-icons:file-type-nuxt",
+            "tags": [
+                "Framework",
+                "SSR"
+            ],
+            "status": "Active"
+        },
+        {
+            "title": "Tauri",
+            "desc": "使用前端构建跨平台桌面应用，比 Electron 更轻量、更安全。",
+            "url": "https://tauri.app",
+            "icon": "vscode-icons:file-type-tauri",
+            "tags": [
+                "Desktop",
+                "Rust"
+            ],
+            "status": "Active"
+        }
+    ]
+}

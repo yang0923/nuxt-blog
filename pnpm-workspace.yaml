@@ -1,0 +1,12 @@
+allowBuilds:
+  '@parcel/watcher': true
+  b: true
+  better-sqlite3: true
+  d: true
+  e: true
+  esbuild: true
+  i: true
+  l: true
+  s: true
+  sharp: false
+  u: true
