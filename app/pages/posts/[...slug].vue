@@ -5,7 +5,7 @@ const router = useRouter()
 // 1. 获取文章数据
 const { data: post, status } = await useAsyncData(`post-${route.path}`, () => {
 	return queryCollection("content").path(route.path).first()
-})
+}, { server: false })
 
 // 2. 核心逻辑：记忆来源路径，解决筛选状态丢失问题
 const backPath = ref("/archive")
@@ -59,14 +59,80 @@ const { data: surround } = await useAsyncData(`surround-${route.path}`, () => {
 	return queryCollectionItemSurroundings("content", route.path, {
 		fields: ["title", "path", "image", "description"],
 	})
-})
+}, { server: false })
+
+const isLoading = computed(() => status.value === 'pending')
 </script>
 
 <template>
 	<div class="max-w-6xl mx-auto px-4">
-		<template v-if="status === 'success' && post">
+		<!-- 加载状态 - 符合网站风格的骨架屏 -->
+		<div v-if="isLoading" class="py-12">
+			<!-- 顶部导航占位 -->
+			<div class="sticky top-16 z-40 -mx-4 px-4 py-3 bg-brand-card border-b border-slate-200/60 dark:border-slate-800/60">
+				<div class="flex items-center justify-between max-w-6xl mx-auto">
+					<div class="w-32 h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+					<div class="w-48 h-3 bg-slate-200 dark:bg-slate-700 rounded animate-pulse hidden md:block"></div>
+				</div>
+			</div>
+
+			<div class="flex flex-col lg:grid lg:grid-cols-[1fr_260px] gap-12 mt-8 pb-20">
+				<!-- 文章内容骨架 -->
+				<article class="min-w-0 space-y-6">
+					<header class="mb-10 space-y-4">
+						<div class="h-10 bg-slate-200 dark:bg-slate-700 rounded-xl w-3/4 animate-pulse"></div>
+						<div class="flex gap-6">
+							<div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-24 animate-pulse"></div>
+							<div class="h-3 bg-slate-200 dark:bg-slate-700 rounded w-20 animate-pulse"></div>
+						</div>
+					</header>
+					<div class="h-64 bg-slate-200 dark:bg-slate-700 rounded-3xl animate-pulse"></div>
+					<div class="space-y-3">
+						<div v-for="i in 12" :key="i" class="h-4 bg-slate-100 dark:bg-slate-800 rounded animate-pulse" :class="i % 3 === 0 ? 'w-3/4' : 'w-full'"></div>
+					</div>
+				</article>
+				<!-- 侧边栏骨架 -->
+				<aside class="hidden lg:block space-y-8">
+					<div class="space-y-3">
+						<div class="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+						<div class="space-y-2">
+							<div v-for="i in 5" :key="i" class="h-3 bg-slate-100 dark:bg-slate-800 rounded w-3/4 animate-pulse"></div>
+						</div>
+					</div>
+					<div class="h-px bg-slate-200 dark:bg-slate-800"></div>
+					<div class="space-y-3">
+						<div class="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+						<div class="h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
+					</div>
+				</aside>
+			</div>
+		</div>
+
+		<!-- 空状态（文章不存在）- 符合网站风格 -->
+		<div v-else-if="status === 'success' && !post" class="py-32 text-center">
+			<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-500/60 text-xs font-bold tracking-widest uppercase mb-6">
+				<Icon name="lucide:terminal" class="w-3 h-3" />
+				<span>404 Not Found</span>
+			</div>
+			<h1 class="text-5xl md:text-7xl font-black text-slate-800 dark:text-white italic tracking-tighter mb-4">
+				Article_<span class="text-primary-500">Missing</span>
+			</h1>
+			<p class="text-slate-500 dark:text-slate-400 text-sm mb-8 max-w-md mx-auto">
+				您访问的文章节点未找到，可能已被移动或删除。
+			</p>
+			<NuxtLink 
+				to="/archive" 
+				class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary-500 text-white font-bold shadow-lg shadow-primary-500/25 hover:scale-105 transition-transform"
+			>
+				<Icon name="lucide:arrow-left" class="w-4 h-4" />
+				返回归档
+			</NuxtLink>
+		</div>
+
+		<!-- 正常内容 -->
+		<template v-else-if="status === 'success' && post">
 			<div
-				class="sticky top-16 z-40 -mx-4 px-4 py-3 transition-all duration-300"
+				class="sticky top-16  z-40 -mx-4 px-4 py-3 transition-all duration-300"
 				:class="scrollY > 20 ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800' : 'bg-transparent border-b border-transparent'"
 			>
 				<div class="flex items-center justify-between max-w-6xl mx-auto">
@@ -79,7 +145,7 @@ const { data: surround } = await useAsyncData(`surround-${route.path}`, () => {
 						<span class="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.3em] hidden md:block truncate max-w-[300px]">
 							{{ post.title }}
 						</span>
-						<div class="h-[1px] w-6 bg-slate-200 dark:bg-slate-800"></div>
+						<div class="h-[1px] w-6 bg-slate-200 dark:border-slate-800"></div>
 					</div>
 				</div>
 			</div>
