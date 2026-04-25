@@ -32,9 +32,10 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
+    preset: 'cloudflare_pages',  // ✅ 关键：指定 Cloudflare Pages 预设
     prerender: {
       autoSubfolderIndex: false
-    }
+    },
   },
   colorMode: {
     classSuffix: '',
