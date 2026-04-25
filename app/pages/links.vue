@@ -12,7 +12,6 @@ definePageMeta({
 
 useHead({ title: "链接 / Connect Nodes" })
 
-type LinkStatus = "Active" | "Offline" | "Archived" | "Pending" | "Blocked"
 
 const appConfig = useAppConfig()
 const route = useRoute()
@@ -58,6 +57,7 @@ const { data: processedGroups, status } = await useAsyncData(
 			})
 	},
 	{
+    server: false,
 		watch: [() => route.query.tag, () => route.query.q],
 	},
 )
@@ -68,7 +68,7 @@ const { data: allTags } = await useAsyncData("links-tags", async () => {
 	const tags = new Set<string>()
 	allData.forEach((s) => s.items?.forEach((i) => i.tags?.forEach((t) => tags.add(t))))
 	return Array.from(tags).sort()
-})
+}, { server: false })
 
 const totalNodes = computed(() => {
 	return processedGroups.value?.reduce((acc, g) => acc + g.items.length, 0) || 0
