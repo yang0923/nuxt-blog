@@ -41,5 +41,8 @@
 				}
 			}
 		}
-	]
+	],
+	"markdownlint.config": {
+		"MD025": false
+	}
 }
