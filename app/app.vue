@@ -11,6 +11,7 @@ router.beforeEach((to, from) => {
 
 <template>
 	<div>
+		<NuxtLoadingIndicator color="var(--primary-500)" :height="3" />
 		<NuxtLayout>
 			<NuxtPage />
 		</NuxtLayout>
