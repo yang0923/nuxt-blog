@@ -10,18 +10,18 @@ tags:
 image: /images/20260425/deploy-nuxt-content-to-cloudflare-pages/core.jpg
 ---
 
-# Nuxt Content 部署到 Cloudflare Pages 完整指南
+## Nuxt Content 部署到 Cloudflare Pages 完整指南
 
 本教程将带你一步步将 Nuxt Content 项目部署到 Cloudflare Pages，并解决刷新页面时数据丢失的问题。
 
-## 前置条件
+### 前置条件
 
 -   Node.js 20+
 -   pnpm / npm / yarn
 -   Cloudflare 账号（免费即可）
 -   Git 仓库（GitHub / GitLab）
 
-## 核心问题说明
+### 核心问题说明
 
 在 Cloudflare 的无服务器环境中，传统的 SQLite 文件存储无法跨实例共享数据。直接部署会出现：
 
@@ -30,15 +30,15 @@ image: /images/20260425/deploy-nuxt-content-to-cloudflare-pages/core.jpg
 
 解决方案：使用 Cloudflare D1 数据库作为统一数据源。
 
-## 第一步：本地项目配置
+### 第一步：本地项目配置
 
-### 1. 安装依赖
+#### 1. 安装依赖
 
 ```bash
 pnpm add @nuxt/content @nuxtjs/tailwindcss @nuxtjs/color-mode @nuxt/icon @nuxt/image @pinia/nuxt pinia
 ```
 
-### 2. 配置 nuxt.config.ts
+#### 2. 配置 nuxt.config.ts
 
 ```ts
 // nuxt.config.ts
@@ -91,7 +91,7 @@ export default defineNuxtConfig({
 
 ```
 
-### 3. 配置 package.json 构建脚本
+#### 3. 配置 package.json 构建脚本
 
 ```json
 {
@@ -104,7 +104,7 @@ export default defineNuxtConfig({
 
 ```
 
-### 4. 处理 pnpm 原生模块（可选）
+#### 4. 处理 pnpm 原生模块（可选）
 
 如果使用 pnpm 10+，在 package.json 中添加：
 
@@ -117,16 +117,16 @@ export default defineNuxtConfig({
 
 ```
 
-## 第二步：Cloudflare 配置
+### 第二步：Cloudflare 配置
 
-### 1. 创建 D1 数据库
+#### 1. 创建 D1 数据库
 
 1. 登录 Cloudflare Dashboard
 2. 进入 Workers & Pages -> D1 SQL Database
 3. 点击 Create Database
 4. 输入名称（如 nuxt-content-db），点击创建
 
-### 2. 创建 Pages 项目
+#### 2. 创建 Pages 项目
 
 1. 进入 Workers & Pages -> Create application -> Pages -> Connect to Git
 2. 选择你的仓库
@@ -141,7 +141,7 @@ Root directory: /
 
 1. 点击 Save and Deploy
 
-### 3. 绑定 D1 数据库
+#### 3. 绑定 D1 数据库
 
 1. 进入 Pages 项目 -> Settings -> Functions
 2. 找到 D1 database bindings -> Add binding
@@ -150,14 +150,14 @@ Root directory: /
    D1 Database: 选择刚才创建的数据库
 4. 点击 Save
 
-### 4. 禁用冲突功能
+#### 4. 禁用冲突功能
 
 在 Cloudflare Dashboard -> 域名 -> Speed -> Optimization：
 
 -   Rocket Loader: 禁用
 -   Mirage: 禁用
 
-### 5. 添加环境变量（可选但推荐）
+#### 5. 添加环境变量（可选但推荐）
 
 在 Pages 项目 -> Settings -> Environment variables 添加：
 
@@ -167,13 +167,13 @@ NODE_VERSION = 24
 
 ```
 
-## 第三步：部署验证
+### 第三步：部署验证
 
-### 1. 触发部署
+#### 1. 触发部署
 
 推送代码到 Git 仓库，Cloudflare 会自动构建部署。
 
-### 2. 检查构建日志
+#### 2. 检查构建日志
 
 成功日志应包含：
 
@@ -183,14 +183,14 @@ NODE_VERSION = 24
 
 ```
 
-### 3. 访问网站
+#### 3. 访问网站
 
 免费域名：<https://你的项目名.pages.dev>
 多次刷新页面，确认数据稳定显示
 
-## 后续维护
+### 后续维护
 
-### 添加新文章
+#### 添加新文章
 
 ```base
 content/
@@ -201,11 +201,11 @@ content/
 
 推送代码 -> 自动部署 -> D1 自动同步
 
-### 修改已有文章
+#### 修改已有文章
 
 直接编辑 .md 文件 -> 推送即可
 
-## 常见问题排查
+### 常见问题排查
 
 | 问题 | 解决方案 |
 | ----- | --------- |
@@ -214,7 +214,7 @@ content/
 | 访问慢 | 添加 SWR 缓存 |
 | 样式丢失 | 检查 CSS 路径，使用 ~/assets/ |
 
-## 完成
+### 完成
 
 你的 Nuxt Content 博客现已稳定运行在 Cloudflare Pages 上，享受全球 CDN 加速和免费的 HTTPS！
 
