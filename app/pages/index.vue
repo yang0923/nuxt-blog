@@ -57,7 +57,7 @@ const { data: recentPosts } = await useAsyncData("recent-posts", () => {
 					<h2 class="text-2xl font-black text-slate-900 dark:text-white uppercase italic tracking-tighter">最新发布</h2>
 					<p class="text-xs text-primary-500 font-bold uppercase tracking-[0.2em]">Recent Posts</p>
 				</div>
-				<NuxtLink to="/posts" class="group flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-primary-500 transition-colors">
+				<NuxtLink to="/archive" class="group flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-primary-500 transition-colors">
 					查看全部 <Icon name="lucide:arrow-right" class="group-hover:translate-x-1 transition-transform" />
 				</NuxtLink>
 			</div>
