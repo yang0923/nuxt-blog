@@ -19,16 +19,6 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/css/main.css'], // 全局 CSS
   content: {
-    // 高亮配置现在在这里
-    database: {
-      type: 'sqlite',
-      // 💡 Nuxt 4 下的正确姿势：
-      // 生产环境（Cloudflare）使用内存数据库，绕过文件系统写入和 C++ 编译权限
-      // 本地环境则在项目根目录生成一个持久化的 sqlite 文件
-      filename: process.env.NODE_ENV === 'production'
-        ? ':memory:'
-        : './.nuxt/content.cache.sqlite'
-    },
     build: {
       markdown: {
         highlight: {
@@ -42,7 +32,6 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
-    // preset: 'cloudflare-pages',
     prerender: {
       autoSubfolderIndex: false
     }
