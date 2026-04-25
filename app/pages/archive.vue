@@ -20,25 +20,20 @@ const searchQuery = ref((route.query.q as string) || "")
 // 监听搜索和标签变化，重置页码并更新路由
 const updateFilters = (newTag?: string, newSearch?: string, newYear?: string) => {
 	const query: any = { page: 1 }
-	// 1. 标签处理：如果有传新值就用新值，没传就用当前已选的（保持状态）
 	const tag = newTag !== undefined ? newTag : selectedTag.value
 	if (tag) query.tag = tag
 
-	// 2. 搜索处理
 	const q = newSearch !== undefined ? newSearch : searchQuery.value
 	if (q) query.q = q
 
-	// 3. 年份处理 (这就是之前出Bug的地方)
-	// 只要 newYear 有传，不管是选了年份还是点击了“全部”（空字符串），都应该更新
 	const year = newYear !== undefined ? newYear : selectedYear.value
 	if (year) query.year = year
 
 	navigateTo({ path: route.path, query })
 }
 
-// 2. 核心查询逻辑：监听路由参数变化自动重查
-// 核心查询逻辑更新：包含搜索条件
-const { data } = await useAsyncData(
+// 2. 核心查询逻辑：解构出 status 用于判断加载状态
+const { data, status } = await useAsyncData(
 	`posts-${selectedTag.value}-${selectedYear.value}-${searchQuery.value}-${currentPage.value}`,
 	async () => {
 		let query = queryCollection("content")
@@ -47,13 +42,11 @@ const { data } = await useAsyncData(
 			query = query.where("tags", "LIKE", `%${selectedTag.value}%`)
 		}
 
-		// 年份过滤 (新增)
 		if (selectedYear.value) {
 			query = query.where("date", "LIKE", `${selectedYear.value}%`)
 		}
 
 		if (searchQuery.value) {
-			// 这里假设你的 content 包含 title 和 description 字段
 			query = query.where("title", "LIKE", `%${searchQuery.value}%`)
 		}
 
@@ -70,7 +63,7 @@ const { data } = await useAsyncData(
 	{ watch: [() => route.query] },
 )
 
-// 获取全站所有不重复的标签（用于筛选栏）
+// 获取全站所有不重复的标签
 const { data: allTags } = await useAsyncData("all-tags", async () => {
 	const items = await queryCollection("content").all()
 	const tags = new Set<string>()
@@ -88,7 +81,7 @@ const { data: allYears } = await useAsyncData("all-years", async () => {
 			years.add(year)
 		}
 	})
-	return Array.from(years).sort((a, b) => Number(b) - Number(a)) // 倒序排
+	return Array.from(years).sort((a, b) => Number(b) - Number(a))
 })
 </script>
 
@@ -141,7 +134,18 @@ const { data: allYears } = await useAsyncData("all-years", async () => {
 			</aside>
 
 			<div class="lg:col-span-8 order-2 lg:order-1 flex flex-col gap-8">
-				<div v-if="data?.posts.length" class="flex flex-col gap-2">
+				<div v-if="status === 'pending'" class="flex flex-col gap-6">
+					<div v-for="i in 3" :key="i" class="w-full h-48 rounded-3xl bg-brand-card animate-pulse border border-slate-100 dark:border-slate-800 flex flex-col p-6 gap-4">
+						<div class="h-8 bg-slate-200 dark:bg-slate-700 rounded-xl w-3/4"></div>
+						<div class="h-4 bg-slate-200 dark:bg-slate-700 rounded-lg w-1/2"></div>
+						<div class="mt-auto flex gap-2">
+							<div class="h-6 w-16 bg-primary-100 dark:bg-primary-900/30 rounded-full"></div>
+							<div class="h-6 w-16 bg-primary-100 dark:bg-primary-900/30 rounded-full"></div>
+						</div>
+					</div>
+				</div>
+
+				<div v-else-if="data?.posts.length" class="flex flex-col gap-2">
 					<div v-for="(post, index) in data.posts" :key="post.path" class="animate-in fade-in slide-in-from-bottom-4 duration-500" :style="{ transitionDelay: `${index * 50}ms` }">
 						<PostCard :post="post" />
 					</div>
