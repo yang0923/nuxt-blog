@@ -21,6 +21,9 @@ export default defineNuxtConfig({
   content: {
     build: {
       markdown: {
+        toc: {
+          depth: 4,
+        },
         highlight: {
           langs: ['rust', 'python', 'js', 'ts', 'vue', 'bash'],
           theme: {

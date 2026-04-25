@@ -1,3 +1,4 @@
+<!-- pages/[...slug].vue -->
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
@@ -10,42 +11,20 @@ const { data: post, status } = await useAsyncData(`post-${route.path}`, () => {
 // 2. 核心逻辑：记忆来源路径，解决筛选状态丢失问题
 const backPath = ref("/archive")
 if (import.meta.client) {
-	// 获取浏览器历史记录中的来源，如果有 query 参数（筛选条件），直接记录全路径
 	const prevRoute = router.options.history.state.back
 	if (typeof prevRoute === "string" && prevRoute.includes("/archive")) {
 		backPath.value = prevRoute
 	}
 }
 
-// 3. 状态追踪：滚动与 TOC 高亮
+// 3. 滚动状态
 const scrollY = ref(0)
-const activeId = ref("")
 
 if (import.meta.client) {
-	window.addEventListener("scroll", () => {
+	const handleScroll = () => {
 		scrollY.value = window.scrollY
-	})
-
-	const observer = new IntersectionObserver(
-		(entries) => {
-			entries.forEach((entry) => {
-				if (entry.isIntersecting) activeId.value = entry.target.id
-			})
-		},
-		{ rootMargin: "0px 0px -80% 0px" },
-	)
-
-	watch(
-		post,
-		(newPost) => {
-			if (newPost) {
-				nextTick(() => {
-					document.querySelectorAll("h2, h3").forEach((el) => observer.observe(el))
-				})
-			}
-		},
-		{ immediate: true },
-	)
+	}
+	window.addEventListener("scroll", handleScroll)
 }
 
 // 4. SEO
@@ -54,7 +33,7 @@ useSeoMeta({
 	description: () => post.value?.description,
 })
 
-// --- 5. 获取相邻文章 (上一篇 & 下一篇) ---
+// 5. 获取相邻文章
 const { data: surround } = await useAsyncData(`surround-${route.path}`, () => {
 	return queryCollectionItemSurroundings("content", route.path, {
 		fields: ["title", "path", "image", "description"],
@@ -62,13 +41,28 @@ const { data: surround } = await useAsyncData(`surround-${route.path}`, () => {
 }, { server: false })
 
 const isLoading = computed(() => status.value === 'pending')
+
+// 平滑滚动到标题
+const scrollToHeading = (id: string) => {
+	if (!import.meta.client) return
+	const element = document.getElementById(id)
+	if (element) {
+		const offset = 140
+		const elementPosition = element.getBoundingClientRect().top
+		const offsetPosition = elementPosition + window.scrollY - offset
+		
+		window.scrollTo({
+			top: offsetPosition,
+			behavior: 'smooth'
+		})
+	}
+}
 </script>
 
 <template>
 	<div class="max-w-6xl mx-auto px-4">
-		<!-- 加载状态 - 符合网站风格的骨架屏 -->
+		<!-- 加载状态 -->
 		<div v-if="isLoading" class="py-12">
-			<!-- 顶部导航占位 -->
 			<div class="sticky top-16 z-40 -mx-4 px-4 py-3 bg-brand-card border-b border-slate-200/60 dark:border-slate-800/60">
 				<div class="flex items-center justify-between max-w-6xl mx-auto">
 					<div class="w-32 h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
@@ -77,7 +71,6 @@ const isLoading = computed(() => status.value === 'pending')
 			</div>
 
 			<div class="flex flex-col lg:grid lg:grid-cols-[1fr_260px] gap-12 mt-8 pb-20">
-				<!-- 文章内容骨架 -->
 				<article class="min-w-0 space-y-6">
 					<header class="mb-10 space-y-4">
 						<div class="h-10 bg-slate-200 dark:bg-slate-700 rounded-xl w-3/4 animate-pulse"></div>
@@ -91,7 +84,6 @@ const isLoading = computed(() => status.value === 'pending')
 						<div v-for="i in 12" :key="i" class="h-4 bg-slate-100 dark:bg-slate-800 rounded animate-pulse" :class="i % 3 === 0 ? 'w-3/4' : 'w-full'"></div>
 					</div>
 				</article>
-				<!-- 侧边栏骨架 -->
 				<aside class="hidden lg:block space-y-8">
 					<div class="space-y-3">
 						<div class="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
@@ -108,7 +100,7 @@ const isLoading = computed(() => status.value === 'pending')
 			</div>
 		</div>
 
-		<!-- 空状态（文章不存在）- 符合网站风格 -->
+		<!-- 空状态 -->
 		<div v-else-if="status === 'success' && !post" class="py-32 text-center">
 			<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-500/60 text-xs font-bold tracking-widest uppercase mb-6">
 				<Icon name="lucide:terminal" class="w-3 h-3" />
@@ -131,8 +123,9 @@ const isLoading = computed(() => status.value === 'pending')
 
 		<!-- 正常内容 -->
 		<template v-else-if="status === 'success' && post">
+			<!-- 顶部导航栏 -->
 			<div
-				class="sticky top-16  z-40 -mx-4 px-4 py-3 transition-all duration-300"
+				class="sticky top-16 z-40 -mx-4 px-4 py-3 transition-all duration-300"
 				:class="scrollY > 20 ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800' : 'bg-transparent border-b border-transparent'"
 			>
 				<div class="flex items-center justify-between max-w-6xl mx-auto">
@@ -150,6 +143,7 @@ const isLoading = computed(() => status.value === 'pending')
 				</div>
 			</div>
 
+			<!-- 主内容区 -->
 			<div class="flex flex-col lg:grid lg:grid-cols-[1fr_260px] gap-12 mt-8 pb-20">
 				<article class="min-w-0">
 					<header class="mb-10">
@@ -158,8 +152,14 @@ const isLoading = computed(() => status.value === 'pending')
 						</h1>
 
 						<div class="flex items-center gap-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-							<span class="flex items-center gap-1.5"><Icon name="lucide:calendar" class="w-3 h-3 text-primary-500" />{{ post.date }}</span>
-							<span class="flex items-center gap-1.5"><Icon name="lucide:hash" class="w-3 h-3 text-primary-500" />{{ post.tags?.[0] }}</span>
+							<span class="flex items-center gap-1.5">
+								<Icon name="lucide:calendar" class="w-3 h-3 text-primary-500" />
+								{{ post.date }}
+							</span>
+							<span class="flex items-center gap-1.5">
+								<Icon name="lucide:hash" class="w-3 h-3 text-primary-500" />
+								{{ post.tags?.[0] }}
+							</span>
 						</div>
 					</header>
 
@@ -171,44 +171,33 @@ const isLoading = computed(() => status.value === 'pending')
 						:value="post"
 						class="prose prose-slate dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-pre:bg-slate-900/95 prose-pre:rounded-2xl prose-pre:border prose-pre:border-white/5 prose-img:rounded-2xl prose-p:leading-loose prose-p:text-slate-600 dark:prose-p:text-slate-300"
 					/>
+					
 					<div class="mt-16 lg:hidden space-y-8">
 						<PostCopyright :post="post" />
 						<PostNavigation :surround="surround" />
 					</div>
 				</article>
 
+				<!-- 右侧 TOC 侧边栏 -->
 				<aside class="hidden lg:block">
 					<div class="sticky top-32 space-y-10">
 						<section>
-							<div class="mb-6 flex items-center gap-2 text-[10px] font-black text-primary-500 uppercase tracking-[0.2em]">
-								<Icon name="lucide:list-tree" class="w-4 h-4" />
+							<div class="mb-4 flex items-center gap-2 text-[10px] font-black text-primary-500 uppercase tracking-[0.2em]">
+								<Icon name="lucide:list-tree" class="w-3.5 h-3.5" />
 								<span>Contents_Map</span>
 							</div>
 
-							<nav class="space-y-1 border-l border-slate-100 dark:border-slate-800">
-								<div v-for="link in post.body?.toc?.links" :key="link.id" class="relative">
-									<a
-										:href="`#${link.id}`"
-										class="block py-2 pl-4 text-[13px] font-bold transition-all duration-300 border-l-2 -ml-[1px]"
-										:class="
-											activeId === link.id
-												? 'text-primary-500 border-primary-500 bg-primary-500/5 shadow-[inset_4px_0_12px_-4px_rgba(var(--color-primary-500),0.1)]'
-												: 'text-slate-400 border-transparent hover:text-slate-600 dark:hover:text-slate-200'
-										"
-									>
-										{{ link.text }}
-									</a>
-									<div v-if="link.children" class="mt-1 ml-4 space-y-1">
-										<a
-											v-for="sub in link.children"
-											:key="sub.id"
-											:href="`#${sub.id}`"
-											class="block py-1.5 pl-4 text-[11px] font-medium transition-colors border-l border-transparent"
-											:class="activeId === sub.id ? 'text-primary-500 border-primary-500' : 'text-slate-400 hover:text-slate-200'"
-										>
-											{{ sub.text }}
-										</a>
-									</div>
+							<nav class="space-y-0.5 border-l border-slate-100 dark:border-slate-800 max-h-[600px] overflow-y-auto">
+								<!-- TOC 组件 - 无需传递 activeId -->
+								<TOCItem
+									v-for="link in post.body?.toc?.links"
+									:key="link.id"
+									:link="link"
+									@click="scrollToHeading"
+								/>
+								
+								<div v-if="!post.body?.toc?.links?.length" class="py-8 text-center">
+									<p class="text-[10px] text-slate-400 uppercase tracking-wider">No_Headings_Detected</p>
 								</div>
 							</nav>
 						</section>
@@ -217,7 +206,6 @@ const isLoading = computed(() => status.value === 'pending')
 
 						<section class="space-y-6">
 							<PostCopyright :post="post" />
-
 							<PostNavigation :surround="surround" />
 						</section>
 					</div>
@@ -228,17 +216,19 @@ const isLoading = computed(() => status.value === 'pending')
 </template>
 
 <style scoped lang="postcss">
-/* 锚点偏移：Header(64px) + BackBar(48px) + 间距(28px) = 140px */
-:deep(h2),
-:deep(h3) {
-	scroll-margin-top: 140px;
-}
-
 :deep(.prose h2) {
 	@apply text-2xl font-black mt-14 mb-6 text-slate-800 dark:text-slate-100 flex items-center gap-3;
 }
+
 :deep(.prose h2::before) {
 	content: "";
 	@apply w-1 h-6 bg-primary-500 rounded-full shadow-[0_0_10px_rgba(var(--color-primary-500),0.4)];
+}
+
+/* 锚点偏移 */
+:deep(h2),
+:deep(h3),
+:deep(h4) {
+	scroll-margin-top: 140px;
 }
 </style>
